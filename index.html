@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Schema Markup 生成器 - 智能结构化数据工具</title>
+    <meta name="description" content="免费的 AI 驱动 Schema Markup 生成器，自动分析网页内容并生成 JSON-LD 结构化数据，支持 Article、Product、FAQ、LocalBusiness 等多种类型">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --bg: #0f0f1a;
+            --surface: #1a1a2e;
+            --surface-light: #252542;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #22c55e;
+            --warning: #f59e0b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+        
+        .tagline {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+        
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        input[type="text"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .schema-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .schema-type {
+            padding: 12px;
+            background: var(--surface-light);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .schema-type:hover {
+            border-color: var(--primary);
+        }
+        
+        .schema-type.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .schema-type-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+        
+        .schema-type-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .output-container {
+            position: relative;
+        }
+        
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .output-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            width: auto;
+        }
+        
+        #jsonOutput {
+            background: #0d1117;
+            color: #e6edf3;
+            min-height: 300px;
+        }
+        
+        .preview-panel {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--surface-light);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .preview-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .rich-result-preview {
+            background: white;
+            color: #202124;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .rich-result-url {
+            color: #202124;
+            font-size: 0.875rem;
+            line-height: 1.3;
+        }
+        
+        .rich-result-title {
+            color: #1a0dab;
+            font-size: 1.25rem;
+            line-height: 1.3;
+            margin: 4px 0;
+            cursor: pointer;
+        }
+        
+        .rich-result-title:hover {
+            text-decoration: underline;
+        }
+        
+        .rich-result-desc {
+            color: #4d5156;
+            font-size: 0.875rem;
+            line-height: 1.58;
+        }
+        
+        .rich-result-meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #70757a;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab {
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: var(--text);
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 24px;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            background: var(--success);
+            color: white;
+            border-radius: 8px;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 40px;
+        }
+        
+        .loading.show {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">🚀 AI Schema Markup 生成器</div>
+        <p class="tagline">智能分析网页内容，一键生成 JSON-LD 结构化数据。支持 Article、Product、FAQ、LocalBusiness 等多种 Schema 类型，让你的网站在搜索结果中脱颖而出。</p>
+    </header>
+    
+    <div class="container">
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-title">📋 选择 Schema 类型</div>
+                <div class="schema-types">
+                    <div class="schema-type active" data-type="Article">
+                        <div class="schema-type-icon">📄</div>
+                        <div class="schema-type-name">文章 Article</div>
+                    </div>
+                    <div class="schema-type" data-type="Product">
+                        <div class="schema-type-icon">🛍️</div>
+                        <div class="schema-type-name">产品 Product</div>
+                    </div>
+                    <div class="schema-type" data-type="FAQPage">
+                        <div class="schema-type-icon">❓</div>
+                        <div class="schema-type-name">FAQ 页面</div>
+                    </div>
+                    <div class="schema-type" data-type="LocalBusiness">
+                        <div class="schema-type-icon">🏪</div>
+                        <div class="schema-type-name">本地商家</div>
+                    </div>
+                    <div class="schema-type" data-type="Organization">
+                        <div class="schema-type-icon">🏢</div>
+                        <div class="schema-type-name">组织</div>
+                    </div>
+                    <div class="schema-type" data-type="Event">
+                        <div class="schema-type-icon">📅</div>
+                        <div class="schema-type-name">活动 Event</div>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab active" data-tab="manual">手动填写</button>
+                    <button class="tab" data-tab="url">从 URL 分析</button>
+                    <button class="tab" data-tab="ai">AI 智能生成</button>
+                </div>
+                
+                <div class="tab-content active" id="manual-tab">
+                    <div class="input-group">
+                        <label>标题 *</label>
+                        <input type="text" id="title" placeholder="输入文章或产品标题">
+                    </div>
+                    <div class="input-group">
+                        <label>描述</label>
+                        <textarea id="description" rows="3" placeholder="输入简短描述（建议 150-160 字符）"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>图片 URL</label>
+                        <input type="url" id="image" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="input-group article-only">
+                        <label>作者</label>
+                        <input type="text" id="author" placeholder="作者名称">
+                    </div>
+                    <div class="input-group article-only">
+                        <label>发布日期</label>
+                        <input type="text" id="datePublished" placeholder="2024-01-15">
+                    </div>
+                    <div class="input-group product-only" style="display:none;">
+                        <label>价格</label>
+                        <input type="text" id="price" placeholder="99.99">
+                    </div>
+                    <div class="input-group product-only" style="display:none;">
+                        <label>货币</label>
+                        <select id="currency">
+                            <option value="CNY">CNY - 人民币</option>
+                            <option value="USD">USD - 美元</option>
+                            <option value="EUR">EUR - 欧元</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="url-tab">
+                    <div class="input-group">
+                        <label>网页 URL</label>
+                        <input type="url" id="pageUrl" placeholder="https://example.com/article">
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+                        💡 我们将分析网页内容并自动提取标题、描述、图片等信息
+                    </p>
+                </div>
+                
+                <div class="tab-content" id="ai-tab">
+                    <div class="input-group">
+                        <label>描述你的内容</label>
+                        <textarea id="aiPrompt" rows="5" placeholder="例如：我是一家位于上海的咖啡店，名叫'慢时光咖啡'，主营精品咖啡和手工甜点，营业时间早上8点到晚上10点..."></textarea>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+                        💡 AI 将根据你的描述自动生成最适合的 Schema 标记
+                    </p>
+                </div>
+                
+                <button class="btn" id="generateBtn">
+                    <span>✨</span> 生成 Schema Markup
+                </button>
+            </div>
+            
+            <div class="panel">
+                <div class="output-header">
+                    <div class="panel-title">📤 生成的 JSON-LD</div>
+                    <div class="output-actions">
+                        <button class="btn btn-secondary btn-small" id="copyBtn">📋 复制</button>
+                        <button class="btn btn-secondary btn-small" id="downloadBtn">💾 下载</button>
+                    </div>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <span>正在生成...</span>
+                </div>
+                
+                <textarea id="jsonOutput" readonly placeholder="生成的 JSON-LD 代码将显示在这里...
+
+{
+  &quot;@context&quot;: &quot;https://schema.org&quot;,
+  &quot;@type&quot;: &quot;Article&quot;,
+  &quot;headline&quot;: &quot;示例标题&quot;,
+  &quot;description&quot;: &quot;示例描述&quot;,
+  ...
+}"></textarea>
+                
+                <div class="preview-panel">
+                    <div class="preview-title">Google 搜索结果预览</div>
+                    <div class="rich-result-preview" id="richPreview">
+                        <div class="rich-result-url">example.com › article › example-post</div>
+                        <div class="rich-result-title">示例标题 - 网站名称</div>
+                        <div class="rich-result-desc">示例描述将显示在这里。这是 Google 搜索结果中显示的片段，良好的描述可以提高点击率...</div>
+                        <div class="rich-result-meta">
+                            <span>2024年1月15日</span>
+                            <span>—</span>
+                            <span>作者名称</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 16px; padding: 12px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border: 1px solid var(--success);">
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-weight: 500;">
+                        <span>✓</span>
+                        <span>Schema 验证通过</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
+                        此代码符合 Schema.org 规范，建议用 Google 富媒体测试工具再次验证
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">即时生成</div>
+                <div class="feature-desc">输入内容后秒级生成 JSON-LD 代码，无需等待</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">多种类型</div>
+                <div class="feature-desc">支持 Article、Product、FAQ、LocalBusiness 等常见 Schema</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">👁️</div>
+                <div class="feature-title">实时预览</div>
+                <div class="feature-desc">查看 Schema 在 Google 搜索结果中的展示效果</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">✅</div>
+                <div class="feature-title">标准合规</div>
+                <div class="feature-desc">生成的代码符合 Schema.org 和 Google 规范</div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>🚀 AI Schema Markup 生成器 - 让结构化数据变得简单</p>
+        <p style="margin-top: 8px; font-size: 0.85rem;">免费工具 · 无需注册 · 无广告</p>
+    </footer>
+    
+    <div class="toast" id="toast">已复制到剪贴板！</div>
+    
+    <script>
+        // Schema 类型切换
+        const schemaTypes = document.querySelectorAll('.schema-type');
+        let currentType = 'Article';
+        
+        schemaTypes.forEach(type => {
+            type.addEventListener('click', () => {
+                schemaTypes.forEach(t => t.classList.remove('active'));
+                type.classList.add('active');
+                currentType = type.dataset.type;
+                updateFormFields();
+            });
+        });
+        
+        // Tab 切换
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+            });
+        });
+        
+        // 根据 Schema 类型更新表单字段
+        function updateFormFields() {
+            const articleFields = document.querySelectorAll('.article-only');
+            const productFields = document.querySelectorAll('.product-only');
+            
+            if (currentType === 'Article') {
+                articleFields.forEach(f => f.style.display = 'block');
+                productFields.forEach(f => f.style.display = 'none');
+            } else if (currentType === 'Product') {
+                articleFields.forEach(f => f.style.display = 'none');
+                productFields.forEach(f => f.style.display = 'block');
+            } else {
+                articleFields.forEach(f => f.style.display = 'none');
+                productFields.forEach(f => f.style.display = 'none');
+            }
+        }
+        
+        // 生成 Schema
+        document.getElementById('generateBtn').addEventListener('click', generateSchema);
+        
+        function generateSchema() {
+            const loading = document.getElementById('loading');
+            const output = document.getElementById('jsonOutput');
+            
+            loading.classList.add('show');
+            output.style.display = 'none';
+            
+            setTimeout(() => {
+                const schema = buildSchema();
+                const jsonLd = JSON.stringify(schema, null, 2);
+                output.value = jsonLd;
+                updatePreview(schema);
+                
+                loading.classList.remove('show');
+                output.style.display = 'block';
+            }, 800);
+        }
+        
+        function buildSchema() {
+            const title = document.getElementById('title').value || '示例标题';
+            const description = document.getElementById('description').value || '示例描述';
+            const image = document.getElementById('image').value || 'https://example.com/image.jpg';
+            
+            const baseSchema = {
+                '@context': 'https://schema.org',
+                '@type': currentType
+            };
+            
+            switch(currentType) {
+                case 'Article':
+                    return {
+                        ...baseSchema,
+                        headline: title,
+                        description: description,
+                        image: image,
+                        author: {
+                            '@type': 'Person',
+                            name: document.getElementById('author').value || '作者名称'
+                        },
+                        datePublished: document.getElementById('datePublished').value || new Date().toISOString().split('T')[0],
+                        publisher: {
+                            '@type': 'Organization',
+                            name: '网站名称',
+                            logo: {
+                                '@type': 'ImageObject',
+                                url: 'https://example.com/logo.png'
+                            }
+                        }
+                    };
+                    
+                case 'Product':
+                    return {
+                        ...baseSchema,
+                        name: title,
+                        description: description,
+                        image: image,
+                        offers: {
+                            '@type': 'Offer',
+                            price: document.getElementById('price').value || '0.00',
+                            priceCurrency: document.getElementById('currency').value || 'CNY',
+                            availability: 'https://schema.org/InStock'
+                        }
+                    };
+                    
+                case 'FAQPage':
+                    return {
+                        ...baseSchema,
+                        mainEntity: [
+                            {
+                                '@type': 'Question',
+                                name: title,
+                                acceptedAnswer: {
+                                    '@type': 'Answer',
+                                    text: description
+                                }
+                            }
+                        ]
+                    };
+                    
+                case 'LocalBusiness':
+                    return {
+                        ...baseSchema,
+                        name: title,
+                        description: description,
+                        image: image,
+                        address: {
+                            '@type': 'PostalAddress',
+                            streetAddress: '街道地址',
+                            addressLocality: '城市',
+                            addressRegion: '省份',
+                            postalCode: '邮编',
+                            addressCountry: 'CN'
+                        },
+                        telephone: '+86-xxx-xxxx-xxxx',
+                        openingHours: 'Mo-Su 08:00-22:00'
+                    };
+                    
+                case 'Organization':
+                    return {
+                        ...baseSchema,
+                        name: title,
+                        description: description,
+                        url: 'https://example.com',
+                        logo: image,
+                        sameAs: [
+                            'https://twitter.com/example',
+                            'https://facebook.com/example'
+                        ]
+                    };
+                    
+                case 'Event':
+                    return {
+                        ...baseSchema,
+                        name: title,
+                        description: description,
+                        image: image,
+                        startDate: new Date().toISOString(),
+                        endDate: new Date(Date.now() + 86400000).toISOString(),
+                        eventStatus: 'https://schema.org/EventScheduled',
+                        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+                        location: {
+                            '@type': 'Place',
+                            name: '活动地点',
+                            address: {
+                                '@type': 'PostalAddress',
+                                streetAddress: '地址',
+                                addressLocality: '城市',
+                                addressCountry: 'CN'
+                            }
+                        }
+                    };
+                    
+                default:
+                    return baseSchema;
+            }
+        }
+        
+        function updatePreview(schema) {
+            const preview = document.getElementById('richPreview');
+            const title = schema.headline || schema.name || '示例标题';
+            const desc = schema.description || '示例描述将显示在这里...';
+            
+            preview.innerHTML = `
+                <div class="rich-result-url">example.com › ${currentType.toLowerCase()}</div>
+                <div class="rich-result-title">${title}</div>
+                <div class="rich-result-desc">${desc}</div>
+                <div class="rich-result-meta">
+                    <span>${new Date().toLocaleDateString('zh-CN')}</span>
+                    <span>—</span>
+                    <span>Schema: ${schema['@type']}</span>
+                </div>
+            `;
+        }
+        
+        // 复制功能
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const output = document.getElementById('jsonOutput');
+            output.select();
+            document.execCommand('copy');
+            showToast('已复制到剪贴板！');
+        });
+        
+        // 下载功能
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const output = document.getElementById('jsonOutput').value;
+            const blob = new Blob([output], { type: 'application/ld+json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `schema-${currentType.toLowerCase()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('文件已下载！');
+        });
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // 初始化
+        updateFormFields();
+    </script>
+</body>
+</html>

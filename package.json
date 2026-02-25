@@ -1,0 +1,12 @@
+{
+  "name": "ai-schema-generator",
+  "version": "1.0.0",
+  "description": "AI驱动的Schema Markup生成器",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": ["schema", "json-ld", "seo", "structured-data"],
+  "author": "",
+  "license": "MIT"
+}
