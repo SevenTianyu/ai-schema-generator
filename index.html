@@ -659,12 +659,28 @@
         
         <!-- Monetization Section -->
         <div class="monetization-info">
-            <h3 data-i18n="monetizationTitle">💰 变现指南</h3>
+            <h3 data-i18n="monetizationTitle">💰 变现与电商集成指南</h3>
             <ul>
                 <li data-i18n="monetization1"><strong>Google AdSense:</strong> 替换代码中的 ca-pub-PLACEHOLDER 为你的发布者 ID，申请地址: https://www.google.com/adsense</li>
                 <li data-i18n="monetization2"><strong>PayPal 中国:</strong> 使用 PayPal China 跨境收款宝，支持网站收款，申请地址: https://www.paypal.cn</li>
-                <li data-i18n="monetization3"><strong>流量要求:</strong> AdSense 需要网站有一定原创内容流量，建议先优化 SEO 获取自然流量</li>
+                <li data-i18n="monetization3"><strong>Shopify + PayPal:</strong> 在 Shopify 后台设置 → 付款 → 添加 PayPal Express Checkout，关联你的 PayPal 企业账户</li>
+                <li data-i18n="monetization4"><strong>流量要求:</strong> AdSense 需要网站有一定原创内容流量，建议先优化 SEO 获取自然流量</li>
             </ul>
+            
+            <div style="margin-top: 24px; padding: 20px; background: var(--bg); border-radius: 8px;">
+                <h4 style="color: var(--primary); margin-bottom: 12px;">🛒 Shopify + PayPal 集成步骤</h4>
+                <ol style="color: var(--text-muted); line-height: 2;">
+                    <li>登录 Shopify 后台 → 设置 → 付款 (Settings > Payments)</li>
+                    <li>在"其他付款方式"中找到 PayPal，点击"完成设置"</li>
+                    <li>登录你的 PayPal 企业账户（没有需先注册）</li>
+                    <li>授权 Shopify 访问你的 PayPal 账户</li>
+                    <li>设置完成，客户可使用 PayPal 付款</li>
+                </ol>                
+                <p style="margin-top: 16px; color: var(--text-muted); font-size: 0.9rem;">
+                    <strong>注意:</strong> 中国商家需要使用 PayPal 企业账户，个人账户可能无法完成集成。
+                    建议同时开通 Shopify Payments（如可用）作为备用支付方式。
+                </p>
+            </div>
         </div>
     </div>
     
@@ -719,10 +735,11 @@
                 feature3Desc: '查看 Schema 在 Google 搜索结果中的展示效果',
                 feature4Title: '标准合规',
                 feature4Desc: '生成的代码符合 Schema.org 和 Google 规范',
-                monetizationTitle: '💰 变现指南',
+                monetizationTitle: '💰 变现与电商集成指南',
                 monetization1: 'Google AdSense: 替换代码中的 ca-pub-PLACEHOLDER 为你的发布者 ID，申请地址: https://www.google.com/adsense',
                 monetization2: 'PayPal 中国: 使用 PayPal China 跨境收款宝，支持网站收款，申请地址: https://www.paypal.cn',
-                monetization3: '流量要求: AdSense 需要网站有一定原创内容流量，建议先优化 SEO 获取自然流量',
+                monetization3: 'Shopify + PayPal: 在 Shopify 后台设置 → 付款 → 添加 PayPal Express Checkout，关联你的 PayPal 企业账户',
+                monetization4: '流量要求: AdSense 需要网站有一定原创内容流量，建议先优化 SEO 获取自然流量',
                 footer: 'AI Schema Markup 生成器 - 让结构化数据变得简单',
                 footerSub: '免费工具 · 无需注册 · 无广告',
                 copied: '已复制到剪贴板！'
@@ -768,10 +785,11 @@
                 feature3Desc: 'View how Schema appears in Google search results',
                 feature4Title: 'Standards Compliant',
                 feature4Desc: 'Generated code complies with Schema.org and Google standards',
-                monetizationTitle: '💰 Monetization Guide',
+                monetizationTitle: '💰 Monetization & E-commerce Guide',
                 monetization1: 'Google AdSense: Replace ca-pub-PLACEHOLDER with your publisher ID. Apply at: https://www.google.com/adsense',
                 monetization2: 'PayPal China: Use PayPal China Cross-border Collection for website payments. Apply at: https://www.paypal.cn',
-                monetization3: 'Traffic Requirements: AdSense requires original content and traffic. Optimize SEO first to get organic traffic.',
+                monetization3: 'Shopify + PayPal: Go to Shopify Settings → Payments → Add PayPal Express Checkout, link your PayPal Business account',
+                monetization4: 'Traffic Requirements: AdSense requires original content and traffic. Optimize SEO first to get organic traffic.',
                 footer: 'AI Schema Markup Generator - Making Structured Data Simple',
                 footerSub: 'Free Tool · No Registration · No Ads',
                 copied: 'Copied to clipboard!'
