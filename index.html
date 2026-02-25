@@ -606,7 +606,7 @@
                     <span data-i18n="generating">正在生成...</span>
                 </div>
                 
-                <textarea id="jsonOutput" readonly placeholder="生成的 JSON-LD 代码将显示在这里..."></textarea>
+                <textarea id="jsonOutput" readonly placeholder=""></textarea>
                 
                 <div class="preview-panel">
                     <div class="preview-title" data-i18n="previewTitle">Google 搜索结果预览</div>
@@ -704,6 +704,7 @@
                 aiHint: '💡 AI 将根据你的描述自动生成最适合的 Schema 标记',
                 generateBtn: '生成 Schema Markup',
                 outputTitle: '📤 生成的 JSON-LD',
+                outputPlaceholder: '生成的 JSON-LD 代码将显示在这里...',
                 copy: '复制',
                 download: '下载',
                 generating: '正在生成...',
@@ -752,6 +753,7 @@
                 aiHint: '💡 AI will automatically generate the most suitable Schema markup based on your description',
                 generateBtn: 'Generate Schema Markup',
                 outputTitle: '📤 Generated JSON-LD',
+                outputPlaceholder: 'Generated JSON-LD code will appear here...',
                 copy: 'Copy',
                 download: 'Download',
                 generating: 'Generating...',
@@ -814,6 +816,9 @@
             document.getElementById('aiPrompt').placeholder = currentLang === 'zh' 
                 ? "例如：我是一家位于上海的咖啡店，名叫'慢时光咖啡'..." 
                 : "e.g., I am a coffee shop in Shanghai called 'Slow Time Coffee'...";
+            
+            // 更新 JSON-LD 输出框 placeholder
+            document.getElementById('jsonOutput').placeholder = texts.outputPlaceholder || '';
         }
         
         // Schema 类型切换
